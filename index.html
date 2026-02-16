@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>2026 新年快乐</title>
     <style>
-        /* --- 0. 字体引入 (使用系统字体，防白屏，稳！) --- */
+        /* --- 0. 字体引入 --- */
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@800&family=Noto+Serif+SC:wght@300;700;900&display=swap');
 
         /* --- 1. 全局设置 --- */
@@ -239,7 +239,7 @@
             }, 4000); 
         }
 
-        // --- 4. 弹幕系统 ---
+        // --- 4. 弹幕系统 (频率加快) ---
         const danmakuContainer = document.getElementById('danmaku-container');
 
         function sendDanmaku(text=null, y=null) {
@@ -260,9 +260,9 @@
             danmakuContainer.appendChild(div);
             setTimeout(() => div.remove(), 10000);
         }
-        setInterval(() => sendDanmaku(), 1500);
+        setInterval(() => sendDanmaku(), 700);
 
-        // --- 5. 点击交互 (配合新特效) ---
+        // --- 5. 点击交互 ---
         window.addEventListener('pointerdown', (e) => {
             if(!started) return;
             createFirework(e.clientX, e.clientY);
@@ -277,8 +277,7 @@
                 clickCount++;
 
                 if(clickCount === contentSequence.length) {
-                    innerTip.innerText = "✨ 2026 万事胜意 ✨";
-                    innerTip.classList.remove('tip-anim');
+                    innerTip.innerText = "👆 继续点击 · 还有烟花 👆";
                     setTimeout(() => {
                         for(let i=0; i<5; i++) createFirework(Math.random()*window.innerWidth, window.innerHeight*0.4);
                     }, 300);
@@ -346,7 +345,8 @@
                 if(particles[i].alpha<=0) particles.splice(i,1);
             }
             
-            if(started && Math.random() < 0.04) {
+            // ★★★ 修改处：从 0.04 改为 0.08，烟花变多 ★★★
+            if(started && Math.random() < 0.08) {
                 createFirework(Math.random()*w, r(h*0.1, h*0.5));
             }
             requestAnimationFrame(loop);
