@@ -17,7 +17,43 @@
             font-family: 'Noto Serif SC', serif;
         }
 
-        /* 画布层：烟花 */
+        /* --- 1. 开屏引导遮罩 (全屏可点) --- */
+        #start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92); /* 背景更黑一点，突出按钮 */
+            z-index: 999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease;
+            cursor: pointer; /* 鼠标变手型 */
+        }
+
+        .start-btn {
+            font-size: 1.4rem;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            padding: 18px 45px;
+            border-radius: 50px;
+            background: rgba(255, 215, 0, 0.1);
+            text-align: center;
+            letter-spacing: 3px;
+            font-weight: bold;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+            animation: pulse 2s infinite;
+            pointer-events: none; /* 让点击事件穿透到父级 overlay */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 25px rgba(255, 215, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+
         canvas {
             position: absolute;
             top: 0;
@@ -25,52 +61,67 @@
             z-index: 1;
         }
 
-        /* 弹幕层：专门放弹幕，不遮挡点击 */
+        /* 音乐按钮 */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            animation: musicRotate 4s linear infinite;
+            opacity: 0; /* 初始隐藏 */
+            transition: opacity 1s;
+        }
+        
+        .music-btn.paused {
+            animation-play-state: paused;
+            opacity: 0.5;
+        }
+
+        @keyframes musicRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 弹幕容器 */
         #danmaku-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5; /* 在烟花之上，文字之下 */
-            pointer-events: none; /* 让点击穿透，不影响放烟花 */
-            overflow: hidden;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5; pointer-events: none; overflow: hidden;
         }
-
-        /* 单个弹幕样式 */
         .danmaku-item {
-            position: absolute;
-            white-space: nowrap;
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 1.1rem;
-            font-weight: 300;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 215, 0, 0.3);
-            opacity: 0;
-            animation: slideLeft linear forwards;
+            position: absolute; white-space: nowrap; color: rgba(255,255,255,0.9);
+            font-size: 1.1rem; font-weight: 300;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8), 0 0 10px rgba(255,215,0,0.4);
+            opacity: 0; animation: slideLeft linear forwards;
             font-family: 'Noto Serif SC', serif;
-            letter-spacing: 1px;
         }
 
-        /* 中间核心文字层 */
+        /* 中间文字 */
         .center-text {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10;
             text-align: center;
             width: 90%;
             pointer-events: none;
-            /* 给背景加一点深色渐变，保证中间文字清晰 */
-            background: radial-gradient(circle, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 70%);
-            padding: 20px;
-            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 70%);
+            padding: 30px; border-radius: 50%;
         }
 
         .year {
             font-family: 'Cinzel', serif;
             font-size: 4.5rem;
-            line-height: 1;
             font-weight: 800;
             background: linear-gradient(to bottom, #fff 30%, #ffd700 100%);
             -webkit-background-clip: text;
@@ -78,25 +129,14 @@
             text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
             margin-bottom: 10px;
         }
-
-        .blessing-main {
-            font-size: 1.2rem;
-            color: #ffecd2;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
-        }
-
+        .blessing-main { font-size: 1.2rem; color: #ffecd2; letter-spacing: 4px; margin-bottom: 15px; }
         .name-box {
-            font-size: 2rem;
-            color: #fff;
-            font-weight: 700;
+            font-size: 2rem; color: #fff; font-weight: 700;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
             border-bottom: 2px solid rgba(212, 175, 55, 0.7);
-            display: inline-block;
-            padding-bottom: 5px;
+            display: inline-block; padding-bottom: 5px;
         }
 
-        /* 弹幕动画关键帧 */
         @keyframes slideLeft {
             0% { transform: translateX(100vw); opacity: 0; }
             5% { opacity: 1; }
@@ -104,7 +144,6 @@
             100% { transform: translateX(-100%); opacity: 0; }
         }
 
-        /* 手机适配 */
         @media screen and (max-width: 480px) {
             .year { font-size: 3.8rem; }
             .name-box { font-size: 1.6rem; }
@@ -114,12 +153,26 @@
 </head>
 <body>
 
+    <!-- 在线音乐 (网易云音乐链接有时会失效，如果没声音，请按照下文方法换成本地文件) -->
+    <audio id="bgm" loop preload="auto">
+        <source src="Vexento - Lonely Dance.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 开屏遮罩 (点击整个屏幕都有效) -->
+    <div id="start-overlay">
+        <div class="start-btn">
+            👇 点击屏幕<br>开启 2026 盛典
+        </div>
+    </div>
+
+    <!-- 音乐按钮 -->
+    <div class="music-btn" id="musicBtn">
+        <div style="font-size: 20px;">🎵</div>
+    </div>
+
     <canvas id="canvas"></canvas>
-    
-    <!-- 弹幕容器 -->
     <div id="danmaku-container"></div>
 
-    <!-- 中间主文字 -->
     <div class="center-text">
         <div class="year">2026</div>
         <div class="blessing-main">新岁序开 · 共赴山海</div>
@@ -127,85 +180,96 @@
     </div>
 
     <script>
-        // --- 1. 名字提取与处理 ---
+        // --- 1. 修复后的启动逻辑 ---
+        const startOverlay = document.getElementById('start-overlay');
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('musicBtn');
+        let hasStarted = false;
+
+        function startApp() {
+            if (hasStarted) return; // 防止重复触发
+            hasStarted = true;
+
+            // 1. 界面优先：立刻隐藏遮罩
+            startOverlay.style.opacity = '0';
+            setTimeout(() => {
+                startOverlay.style.display = 'none';
+            }, 800);
+
+            // 2. 显示音乐按钮
+            musicBtn.style.opacity = '0.9';
+            musicBtn.classList.remove('paused');
+
+            // 3. 尝试播放音乐 (加了错误捕获，防止报错卡死)
+            bgm.play().then(() => {
+                console.log("Music started");
+            }).catch((e) => {
+                console.log("Audio autoplay blocked or failed:", e);
+                // 就算音乐失败，界面也已经进去了，不影响视觉
+                musicBtn.classList.add('paused'); 
+            });
+
+            // 4. 立即燃放开场烟花
+            for(let i=0; i<5; i++) {
+                setTimeout(() => {
+                    createFirework(window.innerWidth/2 + (Math.random()-0.5)*300, window.innerHeight * 0.3);
+                }, i*400);
+            }
+        }
+
+        // 同时绑定 触摸 和 点击 事件，确保万无一失
+        startOverlay.addEventListener('click', startApp);
+        startOverlay.addEventListener('touchstart', startApp, {passive: true});
+
+        
+        // --- 音乐按钮控制 ---
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (bgm.paused) {
+                bgm.play();
+                musicBtn.classList.remove('paused');
+            } else {
+                bgm.pause();
+                musicBtn.classList.add('paused');
+            }
+        });
+
+        // --- 2. 名字与弹幕 ---
         const params = new URLSearchParams(window.location.search);
         let nameText = params.get('name');
-        if (!nameText) nameText = "张爱华"; // 默认名字
-        
-        // 显示中间的大名字
+        if (!nameText) nameText = "朋友"; 
         document.getElementById('name-display').innerText = "To: " + nameText;
 
-        // --- 2. 弹幕系统 (核心新增功能) ---
         const danmakuContainer = document.getElementById('danmaku-container');
-        
-        // 祝福语模板 (所有 {n} 都会被替换成名字)
         const templates = [
-            "祝 {n} 2026 财源广进",
-            "愿 {n} 天天开心",
-            "{n} 新年快乐 万事胜意",
-            "祝 {n} 颜值爆表",
-            "愿 {n} 岁岁平安",
-            "{n} 2026 暴富暴瘦",
-            "祝 {n} 好运连连",
-            "愿 {n} 心想事成",
-            "{n} 必定 升职加薪",
-            "祝 {n} 永远少年",
-            "愿 {n} 所求皆如愿",
-            "祝 {n} 前程似锦",
-            "{n} 2026 开启好运",
-            "愿 {n} 所有的美好如期而至"
+            "祝 {n} 2026 财源广进", "愿 {n} 天天开心", "{n} 新年快乐 万事胜意",
+            "祝 {n} 颜值爆表", "愿 {n} 岁岁平安", "{n} 2026 暴富暴瘦",
+            "祝 {n} 好运连连", "愿 {n} 心想事成", "{n} 必定 升职加薪",
+            "祝 {n} 永远少年", "愿 {n} 所求皆如愿", "祝 {n} 前程似锦"
         ];
-
         function createDanmaku() {
             const div = document.createElement('div');
             div.className = 'danmaku-item';
-            
-            // 随机选取一条祝福语
             const template = templates[Math.floor(Math.random() * templates.length)];
-            // 替换名字
             div.innerText = template.replace(/{n}/g, nameText);
-            
-            // 随机样式属性
-            // 1. 垂直位置 (Top): 5% 到 90% 之间随机，避开太靠边
-            div.style.top = Math.random() * 85 + 5 + '%';
-            
-            // 2. 字体大小微调 (0.9倍 到 1.4倍)
+            div.style.top = Math.random() * 80 + 5 + '%';
             div.style.fontSize = (Math.random() * 0.5 + 0.9) + 'rem';
-            
-            // 3. 颜色微调 (纯白 到 浅金)
-            const isGold = Math.random() > 0.7;
+            const isGold = Math.random() > 0.6;
             div.style.color = isGold ? '#FFD700' : 'rgba(255,255,255,0.9)';
             if(isGold) div.style.textShadow = '0 0 10px #FFD700';
-
-            // 4. 动画速度 (Duration): 8秒 到 15秒 (越小越快)
-            const duration = Math.random() * 7 + 8; 
-            div.style.animationDuration = duration + 's';
-
+            div.style.animationDuration = (Math.random() * 7 + 8) + 's';
             danmakuContainer.appendChild(div);
-
-            // 动画结束后移除元素，防止内存泄漏
-            setTimeout(() => {
-                div.remove();
-            }, duration * 1000);
+            setTimeout(() => { div.remove(); }, 15000);
         }
-
-        // 启动弹幕循环
-        // 初始发一波
-        for(let i=0; i<5; i++) setTimeout(createDanmaku, i * 500);
-        // 之后每 600毫秒 发一条 (你可以改这个数字，越小弹幕越多)
         setInterval(createDanmaku, 600);
 
-
-        // --- 3. 烟花视觉引擎 (保留之前的高级特效) ---
+        // --- 3. 烟花引擎 ---
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let w, h;
         let particles = [];
 
-        function resize() {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-        }
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
         window.addEventListener('resize', resize);
         resize();
 
@@ -213,33 +277,19 @@
 
         class Particle {
             constructor(x, y, vx, vy, color) {
-                this.x = x;
-                this.y = y;
-                this.vx = vx;
-                this.vy = vy;
-                this.color = color;
-                this.alpha = 1;
-                this.gravity = 0.06; 
-                this.friction = 0.95; 
-                this.decay = r(0.015, 0.025);
+                this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+                this.color = color; this.alpha = 1;
+                this.gravity = 0.06; this.friction = 0.95; this.decay = r(0.015, 0.025);
             }
             update() {
-                this.vx *= this.friction;
-                this.vy *= this.friction;
-                this.vy += this.gravity;
-                this.x += this.vx;
-                this.y += this.vy;
+                this.vx *= this.friction; this.vy *= this.friction;
+                this.vy += this.gravity; this.x += this.vx; this.y += this.vy;
                 this.alpha -= this.decay;
             }
             draw() {
-                ctx.save();
-                ctx.globalCompositeOperation = 'lighter';
-                ctx.globalAlpha = this.alpha;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fill(); ctx.restore();
             }
         }
 
@@ -248,7 +298,6 @@
             const type = shapes[Math.floor(Math.random() * shapes.length)];
             let baseHue = Math.floor(Math.random() * 360);
             if (type === 'heart') baseHue = 340; 
-
             const particleCount = (type === 'heart' || type === 'star') ? 100 : 150;
             
             for (let i = 0; i < particleCount; i++) {
@@ -257,52 +306,41 @@
                     const angle = (Math.PI * 2 * i) / particleCount;
                     const pX = 16 * Math.pow(Math.sin(angle), 3);
                     const pY = -(13 * Math.cos(angle) - 5 * Math.cos(2 * angle) - 2 * Math.cos(3 * angle) - Math.cos(4 * angle));
-                    const vel = r(0.18, 0.28); 
-                    vx = pX * vel; vy = pY * vel;
+                    const vel = r(0.18, 0.28); vx = pX * vel; vy = pY * vel;
                 } else if (type === 'star') {
                     const angle = (Math.PI * 2 * i) / particleCount;
                     const radius = 5 + 3 * Math.cos(5 * angle); 
                     const vel = r(0.6, 1.6);
-                    vx = Math.cos(angle) * radius * vel * 0.5;
-                    vy = Math.sin(angle) * radius * vel * 0.5;
+                    vx = Math.cos(angle) * radius * vel * 0.5; vy = Math.sin(angle) * radius * vel * 0.5;
                 } else {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = r(4, 11);
-                    vx = Math.cos(angle) * speed;
-                    vy = Math.sin(angle) * speed;
+                    const angle = Math.random() * Math.PI * 2; const speed = r(4, 11);
+                    vx = Math.cos(angle) * speed; vy = Math.sin(angle) * speed;
                 }
-                const color = `hsl(${baseHue}, 90%, 60%)`;
-                particles.push(new Particle(x, y, vx, vy, color));
+                particles.push(new Particle(x, y, vx, vy, `hsl(${baseHue}, 90%, 60%)`));
             }
         }
 
         function loop() {
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; 
-            ctx.fillRect(0, 0, w, h);
-
+            ctx.fillStyle = 'rgba(5, 5, 5, 0.2)'; ctx.fillRect(0, 0, w, h);
             for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.update();
-                p.draw();
+                const p = particles[i]; p.update(); p.draw();
                 if (p.alpha <= 0) particles.splice(i, 1);
             }
-
-            if (Math.random() < 0.06) {
-                createFirework(Math.random() * w, r(h * 0.1, h * 0.5));
-            }
+            if (Math.random() < 0.05) createFirework(Math.random() * w, r(h * 0.1, h * 0.5));
             requestAnimationFrame(loop);
         }
 
+        // 点击屏幕放烟花
         window.addEventListener('pointerdown', (e) => {
+            // 如果遮罩还没消失，不触发烟花
+            if(startOverlay.style.display !== 'none') return;
+
             createFirework(e.clientX, e.clientY);
-            // 点击时额外增加一条专属弹幕
             const div = document.createElement('div');
             div.className = 'danmaku-item';
             div.innerText = "祝 " + nameText + " 2026 万事如意";
-            div.style.top = e.clientY + 'px';
-            div.style.color = '#FFD700';
-            div.style.fontSize = '1.5rem';
-            div.style.animationDuration = '5s';
+            div.style.top = e.clientY + 'px'; div.style.color = '#FFD700';
+            div.style.fontSize = '1.5rem'; div.style.animationDuration = '5s';
             danmakuContainer.appendChild(div);
             setTimeout(() => div.remove(), 5000);
         });
@@ -310,5 +348,4 @@
         loop();
     </script>
 </body>
-
 </html>
