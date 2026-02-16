@@ -130,7 +130,7 @@
         // --- 1. 名字提取与处理 ---
         const params = new URLSearchParams(window.location.search);
         let nameText = params.get('name');
-        if (!nameText) nameText = "朋友"; // 默认名字
+        if (!nameText) nameText = "张爱华"; // 默认名字
         
         // 显示中间的大名字
         document.getElementById('name-display').innerText = "To: " + nameText;
@@ -310,4 +310,5 @@
         loop();
     </script>
 </body>
+
 </html>
